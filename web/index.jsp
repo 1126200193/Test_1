@@ -58,12 +58,25 @@
                       console.log(2);/!*不执行console.log语句前面有return*!/
                   })*/
                   this.getTest(3000).then((value) =>{
-                      console.log(value);
+                      console.log(1);
                   });
-                  this.getMessage().then((r)=>{
-                      //console.log(r);
-                      this.list = r;
-                  });
+ /*                 then方法返回的是一个新的Promise对象（注意不是原来那个Promiase实例），因此可以采用链式写法，即then方法后面再调用另一个then方法*/
+                 
+                  /*	this.getMessage().then((value)=>{
+                        this.list = value;
+                        console.log(value);
+                  	},(Error)=>{
+                        alert("请求失败");
+                  	});*/
+
+                  	this.getMessage("https://www.apiopen.top/novelApi").then((value)=>{
+                       this.list = value;
+                       console.log(value);
+                  	}).then(function(comments){
+                       console.log("状态改变成功");
+                  	},function(err){
+                       alert("状态改变失败");
+                  	});
               },
               methods:{
                   getTest:function(ms){
@@ -71,9 +84,7 @@
                          setTimeout(resolve,ms,'done');
                      });
                  },
-
-
-                  getMessage:function(){
+                  getMessage:function(url){
                       //then方法可以接受两个回调函数作为参数。第一个回调函数是Promise对象的状态变为resolved时调用，
                       // 第二个回调函数是Promise对象的状态变为rejected时调用。
                       //resolve函数的作用是，将Promise对象的状态从“未完成”变为“成功”（即从 pending 变为 resolved），
@@ -87,14 +98,13 @@
                               }
                               if(this.response.code === 200){
                                    resolve(this.response.data);
-                                  console.log(this.response.data);
                               }
                               else{
                                   reject(new Error(this.statusText));
                               }
                           }
                           const client = new XMLHttpRequest();
-                          client.open("post", "https://www.apiopen.top/novelApi");
+                          client.open("post",url);
                           client.responseType = "json";
                           client.setRequestHeader("Accept", "application/json");
                           client.send();
